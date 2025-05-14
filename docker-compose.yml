@@ -83,3 +83,44 @@ services:
       timeout: 5s
       start_period: 10s
 
+  go-dims:
+    container_name: go-dims-benchmark
+    image: ghcr.io/beetlebugorg/go-dims:edge
+    restart: unless-stopped
+    command: serve
+    ports:
+      - 8080:80
+    environment:
+      DIMS_BIND_ADDRESS: ":80"
+      DIMS_DEVELOPMENT_MODE: true
+      DIMS_SIGNING_KEY: devmode
+      DIMS_JPEG_SUBSAMPLE_MODE: true
+      DIMS_JPEG_OPTIMIZE_CODING: true
+      DIMS_JPEG_QUALITY: 80
+      DIMS_JPEG_QUANT_TABLE: 3
+    depends_on:
+      nginx:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/dims", "health"]
+      interval: 5s
+      timeout: 5s
+      start_period: 3s
+
+  mod-dims:
+    container_name: mod-dims-benchmark
+    image: github.com/beetlebugorg/mod_dims:local
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    environment:
+      DIMS_CLIENT: default
+      DIMS_WHITELIST: nginx
+    depends_on:
+      nginx:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -so /dev/null http://localhost:80/dims-status/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s

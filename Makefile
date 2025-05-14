@@ -3,7 +3,7 @@ SHELL := /usr/bin/env bash
 
 COMPOSE_ARGS=
 
-DURATION='5m'
+DURATION?='5m'
 FORMAT=
 TOOL=
 WIDTH=512
@@ -63,6 +63,11 @@ up-thumbor: up
 up-imagor: TOOL=imagor
 up-imagor: up
 
+up-go-dims: TOOL=go-dims
+up-go-dims: up
+
+up-mod-dims: TOOL=mod-dims
+up-mod-dims: up
 
 k6:
 	$(call check_defined, TOOL, a tool to test)
@@ -70,7 +75,7 @@ k6:
 	$(call check_defined, WIDTH, the resulting image width)
 	$(call check_defined, HEIGHT, the resulting image height)
 
-	docker compose run --rm k6 run -u $$(nproc) -d ${DURATION} \
+	docker compose run --rm k6 run -d ${DURATION} \
 		-e FORMAT="${FORMAT}" \
 		-e TOOL="${TOOL}" \
 		-e WIDTH=${WIDTH} \
@@ -86,6 +91,11 @@ k6-thumbor: k6
 k6-imagor: TOOL=imagor
 k6-imagor: k6
 
+k6-go-dims: TOOL=go-dims
+k6-go-dims: k6
+
+k6-mod-dims: TOOL=mod-dims
+k6-mod-dims: k6
 
 bench-imgproxy: COMPOSE_ARGS=-d --wait
 bench-imgproxy: up-imgproxy k6-imgproxy down
@@ -95,3 +105,9 @@ bench-thumbor: up-thumbor k6-thumbor down
 
 bench-imagor: COMPOSE_ARGS=-d --wait
 bench-imagor: up-imagor k6-imagor down
+
+bench-go-dims: COMPOSE_ARGS=-d --wait
+bench-go-dims: up-go-dims k6-go-dims down
+
+bench-mod-dims: COMPOSE_ARGS=-d --wait
+bench-mod-dims: up-mod-dims k6-mod-dims down

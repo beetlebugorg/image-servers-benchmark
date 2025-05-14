@@ -54,6 +54,12 @@ const formatUrl = (format, quality, filename) => {
     case 'imagor':
       return `http://${scenario.tool}/unsafe/fit-in/${scenario.width}x${scenario.height}/filters:format(${format}):quality(${quality})/http://nginx/${filename}`;
 
+    case 'go-dims':
+      return `http://${scenario.tool}/v5/resize/${scenario.width}x${scenario.height}!/format/${format}/quality/${quality}/?url=http://nginx/${filename}`;
+
+    case 'mod-dims':
+      return `http://${scenario.tool}/dims3/default/resize/${scenario.width}x${scenario.height}!/format/${format}/quality/${quality}/?url=http://nginx/${filename}`;
+
     default:
       throw `Unknown tool ${tool}`;
   }
